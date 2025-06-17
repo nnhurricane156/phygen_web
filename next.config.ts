@@ -1,7 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  webpack(config) {
+    // SVG configuration
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    });
+
+    return config;
+  },
+  // Configure allowed image domains
+  images: {
+    domains: ['randomuser.me'],
+  },
 };
 
 export default nextConfig;
