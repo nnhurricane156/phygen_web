@@ -10,8 +10,28 @@ import {
 import Badge from "@/components/ui/badge/Badge";
 import Image from "next/image";
 
+// Define TypeScript interfaces
+interface User {
+    name: string;
+    role: string;
+    image: string;
+}
+
+interface Team {
+    images: string[];
+}
+
+interface TableDataItem {
+    id: number;
+    user: User;
+    projectName: string;
+    team: Team;
+    status: "Active" | "Pending" | "Cancel";
+    budget: string;
+}
+
 // Sample user data based on the template
-const tableData = [
+const tableData: TableDataItem[] = [
     {
         id: 1,
         user: {
@@ -104,16 +124,14 @@ const tableData = [
 const AdminPage = () => {
     // State for search and pagination
     const [searchTerm, setSearchTerm] = React.useState("");
-    const [currentPage, setCurrentPage] = React.useState(1);
-
-    // Function to handle search input changes
-    const handleSearch = (e) => {
+    const [currentPage, setCurrentPage] = React.useState(1);    // Function to handle search input changes
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
         setCurrentPage(1); // Reset to first page on search
     };
 
     // Function to handle page changes
-    const handlePageChange = (pageNumber) => {
+    const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
     };
 
