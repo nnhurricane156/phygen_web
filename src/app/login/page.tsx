@@ -5,11 +5,14 @@ import Label from "@/components/form/Label";
 import EyeCloseIcon from "@/components/icons/eye-close.svg";
 import EyeIcon from "@/components/icons/eye.svg";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useActionState, useState } from "react";
+import { loginUser } from "@/actions/auth"; // Adjust the import path as necessary
+import { stat } from "fs";
 
 export default function SignInForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [state, loginAction] = useActionState(loginUser, undefined)
 
     return (
         <div className="flex h-screen bg-white justify-center items-center">
@@ -53,24 +56,29 @@ export default function SignInForm() {
                                     </span>
                                 </div>
                             </div>
-                            <form>
+                            <form action={loginAction}>
                                 <div className="space-y-4">
                                     <div>
                                         <Label>
                                             Email <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
+                                            name="email"
                                             placeholder="info@gmail.com"
                                             type="email"
                                             className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
                                         />
                                     </div>
+                                    {state?.error?.email && (
+                                        <p className="text-red-500">{state.error.email}</p>
+                                    )}
                                     <div>
                                         <Label>
                                             Password <span className="text-red-500">*</span>
                                         </Label>
                                         <div className="relative">
                                             <Input
+                                                name="password"
                                                 type={showPassword ? "text" : "password"}
                                                 placeholder="Enter your password"
                                                 className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
@@ -87,6 +95,9 @@ export default function SignInForm() {
                                             </span>
                                         </div>
                                     </div>
+                                    {state?.error?.password && (
+                                        <p className="text-red-500">{state.error.password}</p>
+                                    )}
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <Checkbox checked={isChecked} onChange={setIsChecked} />
@@ -103,7 +114,7 @@ export default function SignInForm() {
                                     </div>
                                     <div>
                                         <button
-                                            type="button"
+                                            type="submit"
                                             className="w-full py-3 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
                                         >
                                             Sign In
