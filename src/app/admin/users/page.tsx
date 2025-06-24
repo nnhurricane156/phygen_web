@@ -7,7 +7,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table/index";
-import Badge from "@/components/ui/badge/Badge";
 import Image from "next/image";
 
 interface User {
@@ -188,8 +187,8 @@ const UsersPage = () => {
                                         </TableCell>
                                         <TableCell className="px-5 py-4 text-start">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === "Active"
-                                                    ? "bg-green-100 text-green-800"
-                                                    : "bg-gray-100 text-gray-800"
+                                                ? "bg-green-100 text-green-800"
+                                                : "bg-gray-100 text-gray-800"
                                                 }`}>
                                                 {user.status}
                                             </span>

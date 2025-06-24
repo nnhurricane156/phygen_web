@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { ApexOptions } from "apexcharts";
 
 // Import ApexCharts dynamically to avoid SSR issues
 const ApexCharts = dynamic(() => import("react-apexcharts"), {
@@ -10,8 +11,8 @@ const ApexCharts = dynamic(() => import("react-apexcharts"), {
 
 interface ChartWrapperProps {
     type: "line" | "area" | "bar" | "pie" | "donut" | "radialBar" | "scatter" | "bubble" | "heatmap" | "candlestick" | "boxPlot" | "radar" | "polarArea" | "rangeBar" | "rangeArea" | "treemap";
-    series: any[];
-    options: any;
+    series: ApexAxisChartSeries | ApexNonAxisChartSeries;
+    options: ApexOptions;
     width?: string | number;
     height?: string | number;
 }

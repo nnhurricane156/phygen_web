@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import AdminUserDropdown from "./AdminUserDropdown";
 import RoleBasedHeader from "./RoleBasedHeader";
 
 /**

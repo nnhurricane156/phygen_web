@@ -6,7 +6,6 @@ import NotificationDropdown from "./NotificationDropdown";
 import AdminUserDropdown from "./AdminUserDropdown";
 import { useSidebar } from "@/context/SidebarContext";
 import Link from "next/link";
-import Image from "next/image";
 
 /**
  * Shared Header Component for different user roles (admin, manager, user)
@@ -27,7 +26,6 @@ interface RoleBasedHeaderProps {
 const RoleBasedHeader: React.FC<RoleBasedHeaderProps> = ({
     title,
     userRole,
-    logoPath = "/images/logo/logo.svg",
     extraContent
 }) => {
     const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);

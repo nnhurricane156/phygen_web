@@ -9,34 +9,34 @@ import {
 } from "@/components/ui/table/index";
 import Badge from "@/components/ui/badge/Badge";
 import Image from "next/image";
-import { logoutUser } from "@/actions/auth";
 import { EcommerceMetrics } from "@/components/ecommerce/EcommerceMetrics";
 import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
 import StatisticsChart from "@/components/ecommerce/StatisticsChart";
 import MonthlyTarget from "@/components/ecommerce/MonthlyTarget";
 
 // Define TypeScript interfaces
-interface User {
-    name: string;
-    role: string;
-    image: string;
-}
+// interface User {
+//     name: string;
+//     role: string;
+//     image: string;
+// }
 
-interface Team {
-    images: string[];
-}
+// interface Team {
+//     images: string[];
+// }
 
-interface TableDataItem {
-    id: number;
-    user: User;
-    projectName: string;
-    team: Team;
-    status: "Active" | "Pending" | "Cancel";
-    budget: string;
-}
+// interface TableDataItem {
+//     id: number;
+//     user: User;
+//     projectName: string;
+//     team: Team;
+//     status: "Active" | "Pending" | "Cancel";
+//     budget: string;
+// }
 
 // Sample user data based on the template
-const tableData: TableDataItem[] = [
+/*
+const _tableData: TableDataItem[] = [
     {
         id: 1,
         user: {
@@ -120,11 +120,11 @@ const tableData: TableDataItem[] = [
                 "https://randomuser.me/api/portraits/women/10.jpg",
                 "https://randomuser.me/api/portraits/men/11.jpg"
             ]
-        },
-        status: "Active",
+        },        status: "Active",
         budget: "4.5K"
     }
 ];
+*/
 
 const AdminPage = () => {
     // State for search and pagination

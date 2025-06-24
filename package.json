@@ -11,12 +11,15 @@
   "dependencies": {
     "@react-jvectormap/core": "^1.0.4",
     "@react-jvectormap/world": "^1.1.2",
+    "@types/flatpickr": "^3.0.2",
     "apexcharts": "^4.7.0",
+    "flatpickr": "^4.6.13",
     "jose": "^6.0.11",
     "next": "15.3.3",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",
     "react-dom": "^19.0.0",
+    "react-dropzone": "^14.3.8",
     "tailwind-merge": "^3.3.1",
     "zod": "^3.25.67"
   },

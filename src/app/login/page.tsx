@@ -7,7 +7,6 @@ import EyeIcon from "@/components/icons/eye.svg";
 import Link from "next/link";
 import React, { useActionState, useState } from "react";
 import { loginUser } from "@/actions/auth"; // Adjust the import path as necessary
-import { stat } from "fs";
 
 export default function SignInForm() {
     const [showPassword, setShowPassword] = useState(false);

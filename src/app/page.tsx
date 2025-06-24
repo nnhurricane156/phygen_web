@@ -158,14 +158,15 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <div className="md:w-2/5">
-          <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 shadow-lg">
-            <img
-              src="/file.svg"
-              alt="Physics Exam"
-              className="w-full h-auto"
-            />
-          </div>
+        <div className="md:w-2/5">          <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 shadow-lg">
+          <Image
+            src="/file.svg"
+            alt="Physics Exam"
+            className="w-full h-auto"
+            width={400}
+            height={300}
+          />
+        </div>
         </div>
       </section>
 

@@ -8,7 +8,6 @@ import {
     TableRow,
 } from "@/components/ui/table/index";
 import Badge from "@/components/ui/badge/Badge";
-import Image from "next/image";
 import Button from "@/components/ui/button/Button";
 
 // Sample curriculum data based on the image

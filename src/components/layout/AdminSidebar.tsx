@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useCallback } from "react";
 import Link from "next/link";
 import { useSidebar } from "@/context/SidebarContext";
 import { usePathname } from "next/navigation";
@@ -57,7 +57,7 @@ const navItems: NavItem[] = [
 ];
 
 const AdminSidebar: React.FC = () => {
-    const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+    const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
     const pathname = usePathname();
 
     // Check if a nav item is active
@@ -126,13 +126,11 @@ const AdminSidebar: React.FC = () => {
                         </ul>
                     </nav>                    {/* Sidebar widget removed as per requirements */}
                 </div>
-            </aside>
-
-            {/* Backdrop for mobile sidebar */}
+            </aside>            {/* Backdrop for mobile sidebar */}
             {isMobileOpen && (
                 <div
                     className="fixed inset-0 z-40 bg-gray-900/50 lg:hidden"
-                    onClick={() => useSidebar().toggleMobileSidebar()}
+                    onClick={toggleMobileSidebar}
                 />
             )}
         </>

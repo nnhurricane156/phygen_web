@@ -9,7 +9,7 @@ const testUser = {
     id: "1",
     email: "admin@gmail.com",
     name: "Admin User",
-    pássword: "password",
+    password: "password",
     isAdmin: true,
 }
 
@@ -21,7 +21,7 @@ const loginSchema = z.object({
         .trim(),
 });
 
-export async function loginUser(prevState: any, formData: FormData) {
+export async function loginUser(prevState: unknown, formData: FormData) {
     const result = loginSchema.safeParse(Object.fromEntries(formData))
 
     if (!result.success) {
@@ -47,7 +47,7 @@ export async function loginUser(prevState: any, formData: FormData) {
 
 
 
-export async function registerUser(data: z.infer<typeof loginSchema>) { }
+export async function registerUser() { }
 
 export async function logoutUser() {
     await deleteSession();
