@@ -4,7 +4,7 @@ import { createSession } from "@/lib/session";
 import { deleteSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { API_ENDPOINTS, USER_ROLES, type ApiResponse, type LoginResponse, type RegisterResponse } from "@/lib/api";
+import { API_ENDPOINTS, USER_ROLES, type ApiResponse, type LoginResponse } from "@/lib/api";
 
 const loginSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -144,7 +144,7 @@ export async function registerUser(prevState: unknown, formData: FormData) {
         if (!response.ok) {
             // Handle validation errors from server
             if (data.errors) {
-                const errorObj: any = {};
+                const errorObj: Record<string, string[]> = {};
 
                 // Map server errors to form fields
                 if (data.errors.UserName) {
