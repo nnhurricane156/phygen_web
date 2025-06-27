@@ -5,13 +5,63 @@ import Label from "@/components/form/Label";
 import EyeCloseIcon from "@/components/icons/eye-close.svg";
 import EyeIcon from "@/components/icons/eye.svg";
 import Link from "next/link";
-import React, { useActionState, useState } from "react";
+import React, { useActionState, useState, useEffect } from "react";
 import { loginUser } from "@/actions/auth"; // Adjust the import path as necessary
+import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
+import SuccessMessage from "@/components/ui/SuccessMessage";
+
+function SubmitButton() {
+    const { pending } = useFormStatus();
+
+    return (
+        <button
+            type="submit"
+            disabled={pending}
+            className="w-full py-3 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+            {pending ? "Signing In..." : "Sign In"}
+        </button>
+    );
+}
 
 export default function SignInForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
     const [state, loginAction] = useActionState(loginUser, undefined)
+    const router = useRouter();
+
+    // Fix hydration mismatch
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // Handle redirect after successful login
+    useEffect(() => {
+        if (state?.success && state?.redirectTo && isMounted) {
+            router.push(state.redirectTo);
+        }
+    }, [state, router, isMounted]);
+
+    // Prevent hydration mismatch by not rendering until mounted
+    if (!isMounted) {
+        return (
+            <div className="flex h-screen bg-white justify-center items-center">
+                <div className="flex flex-col w-full max-w-md bg-white px-6 py-8 sm:px-8 rounded-xl shadow-lg border border-gray-200 mx-4">
+                    <div className="animate-pulse">
+                        <div className="h-8 bg-gray-200 rounded mb-4"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-8"></div>
+                        <div className="space-y-4">
+                            <div className="h-10 bg-gray-200 rounded"></div>
+                            <div className="h-10 bg-gray-200 rounded"></div>
+                            <div className="h-10 bg-gray-200 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen bg-white justify-center items-center">
@@ -32,6 +82,7 @@ export default function SignInForm() {
                             <p className="text-sm text-gray-500">
                                 Enter your email and password to sign in!
                             </p>
+                            <SuccessMessage />
                         </div>
                         <div>
                             <div className="flex justify-center w-full">
@@ -67,10 +118,10 @@ export default function SignInForm() {
                                             type="email"
                                             className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
                                         />
+                                        {state?.error?.email && (
+                                            <p className="text-red-500 text-sm mt-1">{state.error.email}</p>
+                                        )}
                                     </div>
-                                    {state?.error?.email && (
-                                        <p className="text-red-500">{state.error.email}</p>
-                                    )}
                                     <div>
                                         <Label>
                                             Password <span className="text-red-500">*</span>
@@ -93,10 +144,10 @@ export default function SignInForm() {
                                                 )}
                                             </span>
                                         </div>
+                                        {state?.error?.password && (
+                                            <p className="text-red-500 text-sm mt-1">{state.error.password}</p>
+                                        )}
                                     </div>
-                                    {state?.error?.password && (
-                                        <p className="text-red-500">{state.error.password}</p>
-                                    )}
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <Checkbox checked={isChecked} onChange={setIsChecked} />
@@ -112,12 +163,7 @@ export default function SignInForm() {
                                         </Link>
                                     </div>
                                     <div>
-                                        <button
-                                            type="submit"
-                                            className="w-full py-3 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
-                                        >
-                                            Sign In
-                                        </button>
+                                        <SubmitButton />
                                     </div>
                                 </div>
                             </form>

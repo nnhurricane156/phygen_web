@@ -5,11 +5,64 @@ import Label from "@/components/form/Label";
 import EyeCloseIcon from "@/components/icons/eye-close.svg";
 import EyeIcon from "@/components/icons/eye.svg";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useActionState, useState, useEffect } from "react";
+import { registerUser } from "@/actions/auth";
+import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
+
+function SubmitButton() {
+    const { pending } = useFormStatus();
+
+    return (
+        <button
+            type="submit"
+            disabled={pending}
+            className="w-full py-3 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+            {pending ? "Creating Account..." : "Sign Up"}
+        </button>
+    );
+}
 
 export default function SignUpForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+    const [state, registerAction] = useActionState(registerUser, undefined);
+    const router = useRouter();
+
+    // Fix hydration mismatch
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // Handle redirect after successful registration
+    useEffect(() => {
+        if (state?.success && state?.redirectTo && isMounted) {
+            // Add success message to URL params for login page to display
+            router.push(`${state.redirectTo}?message=${encodeURIComponent(state.message || "Registration successful!")}`);
+        }
+    }, [state, router, isMounted]);
+
+    // Prevent hydration mismatch by not rendering until mounted
+    if (!isMounted) {
+        return (
+            <div className="flex h-screen bg-white justify-center items-center">
+                <div className="flex flex-col w-full max-w-md bg-white px-6 py-8 sm:px-8 rounded-xl shadow-lg border border-gray-200 mx-4">
+                    <div className="animate-pulse">
+                        <div className="h-8 bg-gray-200 rounded mb-4"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-8"></div>
+                        <div className="space-y-4">
+                            <div className="h-10 bg-gray-200 rounded"></div>
+                            <div className="h-10 bg-gray-200 rounded"></div>
+                            <div className="h-10 bg-gray-200 rounded"></div>
+                            <div className="h-10 bg-gray-200 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen bg-white justify-center items-center">
@@ -52,39 +105,36 @@ export default function SignUpForm() {
                                         Or
                                     </span>
                                 </div>
-                            </div>                            <form>
+                            </div>                            <form action={registerAction}>
                                 <div className="space-y-4">
-                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        <div>
-                                            <Label>
-                                                First Name<span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                placeholder="Enter your first name"
-                                                type="text"
-                                                className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>
-                                                Last Name<span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                placeholder="Enter your last name"
-                                                type="text"
-                                                className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
-                                            />
-                                        </div>
+                                    <div>
+                                        <Label>
+                                            Username <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Input
+                                            name="userName"
+                                            placeholder="Enter your username"
+                                            type="text"
+                                            className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Only letters allowed (no numbers or special characters)</p>
+                                        {state?.error?.userName && (
+                                            <p className="text-red-500 text-sm mt-1">{state.error.userName}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <Label>
                                             Email <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
+                                            name="email"
                                             placeholder="Enter your email"
                                             type="email"
                                             className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
                                         />
+                                        {state?.error?.email && (
+                                            <p className="text-red-500 text-sm mt-1">{state.error.email}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <Label>
@@ -92,6 +142,7 @@ export default function SignUpForm() {
                                         </Label>
                                         <div className="relative">
                                             <Input
+                                                name="password"
                                                 type={showPassword ? "text" : "password"}
                                                 placeholder="Enter your password"
                                                 className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
@@ -107,21 +158,24 @@ export default function SignUpForm() {
                                                 )}
                                             </span>
                                         </div>
-                                    </div>                                    <div className="flex items-start gap-2">
-                                        <div className="pt-1">
-                                            <Checkbox checked={isChecked} onChange={setIsChecked} />
-                                        </div>
-                                        <span className="text-sm text-gray-700">
-                                            By creating an account means you agree to the <Link href="/terms" className="text-blue-600 font-medium">Terms and Conditions</Link>, and our <Link href="/privacy" className="text-blue-600 font-medium">Privacy Policy</Link>
-                                        </span>
+                                        {state?.error?.password && (
+                                            <p className="text-red-500 text-sm mt-1">{state.error.password}</p>
+                                        )}
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <Checkbox
+                                            id="terms-checkbox"
+                                            checked={isChecked}
+                                            onChange={setIsChecked}
+                                            label={
+                                                <span className="text-sm text-gray-700">
+                                                    By creating an account means you agree to the <Link href="/terms" className="text-blue-600 font-medium">Terms and Conditions</Link>, and our <Link href="/privacy" className="text-blue-600 font-medium">Privacy Policy</Link>
+                                                </span>
+                                            }
+                                        />
                                     </div>
                                     <div>
-                                        <button
-                                            type="button"
-                                            className="w-full py-3 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
-                                        >
-                                            Sign Up
-                                        </button>
+                                        <SubmitButton />
                                     </div>
                                 </div>
                             </form>
