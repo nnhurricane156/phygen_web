@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { decrypt } from "./lib/session";
 
 // const protectedRoutes = ["/admin", "/manager", "/createExam"];
-const protectedRoutes = ["/manager", "/createExam"];
+const protectedRoutes = [""];
 
 const publicRoutes = ["/login", "/register"];
 
