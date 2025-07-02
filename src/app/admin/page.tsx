@@ -91,7 +91,6 @@ const sampleExams: ExamData[] = [
 const AdminPage = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(1);
-  const itemsPerPage = 5;
 
   // Filter exams based on search term
   const filteredExams = sampleExams.filter(exam =>

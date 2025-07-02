@@ -7,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/index";
-import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal/index";
 
 interface Question {

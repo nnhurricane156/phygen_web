@@ -9,7 +9,6 @@ export default function CreateExamForm() {
 
     // Options for the form
     const gradeLevels = [10, 11, 12];
-    const chapters = [1, 2, 3, 4];
     const difficultyLevels = ["Easy", "Medium", "Hard"];
 
     // Handle form submission

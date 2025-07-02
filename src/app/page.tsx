@@ -1,11 +1,9 @@
 "use client";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import Button from "@/components/ui/button/Button";
-import Badge from "@/components/ui/badge/Badge";
 import Link from "next/link";
 import HeaderAuth from "@/components/header/HeaderAuth";
 import ExamGenerator from "@/components/exam/ExamGenerator";
-import { useState, useEffect } from "react";
 
 // Mock data for physics topics
 const physicsTopics = [
@@ -436,7 +434,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <p className="text-gray-700 text-sm italic">"{story.text}"</p>
+                <p className="text-gray-700 text-sm italic">&ldquo;{story.text}&rdquo;</p>
               </div>
             ))}
           </div>
@@ -498,7 +496,7 @@ export default function Home() {
                 </span>
               </div>
               
-              <p className="text-gray-700">"{review.comment}"</p>
+              <p className="text-gray-700">&ldquo;{review.comment}&rdquo;</p>
             </div>
           ))}
         </div>
@@ -509,7 +507,7 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-white mb-4">Ready to Create Physics Exams?</h2>
         <p className="text-indigo-100 mb-8 max-w-2xl mx-auto">
           Join thousands of physics educators who use PhyGen to create engaging, 
-          comprehensive exams tailored to their students' needs.
+          comprehensive exams tailored to their students&apos; needs.
         </p>        
         <div className="flex justify-center gap-4 mb-6">
           <Link href="/createExam">
