@@ -18,7 +18,7 @@ function SubmitButton() {
         <button
             type="submit"
             disabled={pending}
-            className="w-full py-3 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
             {pending ? "Signing In..." : "Sign In"}
         </button>

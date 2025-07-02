@@ -15,7 +15,7 @@ const AdminHeader: React.FC = () => {
     // This badge indicates the user's role (admin in this case)
     const adminSpecificContent = (
         <div className="px-3">
-            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+            <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
                 Admin
             </span>
         </div>

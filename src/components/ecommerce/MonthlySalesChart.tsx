@@ -93,7 +93,7 @@ export default function MonthlySalesChart() {
   };
   const series = [
     {
-      name: "Sales",
+      name: "Uses",
       data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
     },
   ];

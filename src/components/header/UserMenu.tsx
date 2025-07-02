@@ -54,9 +54,9 @@ export default function UserMenu({ user }: UserMenuProps) {
         <div className="relative">
             <button
                 onClick={() => isMounted && setIsOpen(!isOpen)}
-                className="flex items-center space-x-3 text-gray-700 hover:text-blue-700 font-medium"
+                className="flex items-center space-x-3 text-gray-700 hover:text-indigo-700 font-medium"
             >
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
                     {user.name.charAt(0).toUpperCase()}
                 </div>
                 <span className="hidden md:block">{user.name}</span>
@@ -75,7 +75,7 @@ export default function UserMenu({ user }: UserMenuProps) {
                     <div className="px-4 py-2 border-b border-gray-100">
                         <p className="text-sm font-medium text-gray-900">{user.name}</p>
                         <p className="text-xs text-gray-500">{user.email}</p>
-                        <p className="text-xs text-blue-600">{getUserRoleName(user.role)}</p>
+                        <p className="text-xs text-indigo-600">{getUserRoleName(user.role)}</p>
                     </div>
                     <Link
                         href={getDashboardLink(user.role)}

@@ -79,7 +79,7 @@ const RoleBasedHeader: React.FC<RoleBasedHeaderProps> = ({
     // Role-specific class to change header appearance based on user role
     const roleClass = {
         'admin': '',
-        'manager': 'bg-blue-50',
+        'manager': 'bg-indigo-50',
         'user': 'bg-gray-50'
     };
 

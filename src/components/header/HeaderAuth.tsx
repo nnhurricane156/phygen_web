@@ -57,19 +57,18 @@ export default function HeaderAuth() {
     }
 
     return (
-        <div className="flex items-center space-x-3">
-            <Link
+        <div className="flex items-center space-x-3">              <Link
                 href="/login"
-                className="px-4 py-2 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 font-medium"
-            >
+                className="px-4 py-2 text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50 font-medium"
+              >
                 Login
-            </Link>
-            <Link
+              </Link>
+              <Link
                 href="/register"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-            >
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium"
+              >
                 Register
-            </Link>
+              </Link>
         </div>
     );
 }

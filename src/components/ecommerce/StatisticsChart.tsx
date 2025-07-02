@@ -123,11 +123,7 @@ export default function StatisticsChart() {
     <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
       <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
         <div className="w-full">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Statistics
-          </h3>          <p className="mt-1 text-gray-500 text-theme-sm">
-            Target you&apos;ve set for each month
-          </p>
+          <h3 className="text-lg font-semibold text-gray-800">Statistics</h3>{" "}
         </div>
         <div className="flex items-start w-full gap-3 sm:justify-end">
           <ChartTab />

@@ -9,6 +9,28 @@ import {
 } from "@/components/ui/table/index";
 import Badge from "@/components/ui/badge/Badge";
 import Link from "next/link";
+import { 
+  BookOpenIcon, 
+  AcademicCapIcon, 
+  UserGroupIcon, 
+  ClipboardDocumentListIcon,
+  ChartBarIcon,
+  EyeIcon,
+  PencilIcon,
+  TrashIcon
+} from "@heroicons/react/24/outline";
+
+"use client";
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table/index";
+import Badge from "@/components/ui/badge/Badge";
+import Link from "next/link";
 
 // Interface for exam data
 interface ExamData {
@@ -456,5 +478,7 @@ const AdminPage = () => {
     </div>
   );
 };
+
+export default AdminPage;
 
 export default AdminPage;

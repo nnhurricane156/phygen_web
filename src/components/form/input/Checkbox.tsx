@@ -29,7 +29,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
           type="checkbox"
           className={`w-5 h-5 appearance-none cursor-pointer border-2 border-gray-300 dark:border-gray-600 rounded-md 
           bg-white dark:bg-gray-800 
-          checked:bg-blue-600 checked:border-blue-600 
+          checked:bg-indigo-600 checked:border-indigo-600 
           focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
           disabled:opacity-60 disabled:cursor-not-allowed
           transition-colors duration-200
