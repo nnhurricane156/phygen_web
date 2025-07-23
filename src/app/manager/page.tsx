@@ -8,7 +8,6 @@ import {
     TableRow,
 } from "@/components/ui/table/index";
 import Badge from "@/components/ui/badge/Badge";
-import Image from "next/image";
 import Button from "@/components/ui/button/Button";
 
 // Sample curriculum data based on the image
@@ -87,7 +86,7 @@ const ContentManagerPage = () => {
     }; return (
         <div className="container mx-auto px-4 py-8">
             <div className="flex items-center mb-6">
-                <button className="mr-3">
+                <button className="cursor-pointer mr-3">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         className="text-gray-700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -106,7 +105,7 @@ const ContentManagerPage = () => {
                             placeholder="Search..."
                             value={searchTerm}
                             onChange={handleSearch}
-                            className="py-2 px-4 pl-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="py-2 px-4 pl-10 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         />
                         <div className="absolute left-3 top-1/2 -translate-y-1/2">
                             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-400">
@@ -189,7 +188,7 @@ const ContentManagerPage = () => {
                                             <div className="flex space-x-2">
                                                 <Button
                                                     onClick={() => handleEdit(entry.id)}
-                                                    className="bg-red-500 text-white hover:bg-red-600 px-3 py-1.5 text-sm rounded"
+                                                    className="bg-indigo-600 text-white hover:bg-indigo-700 px-3 py-1.5 text-sm rounded"
                                                 >
                                                     Edit
                                                 </Button>
@@ -201,7 +200,7 @@ const ContentManagerPage = () => {
                                                 </Button>
                                                 <Button
                                                     onClick={handleAdd}
-                                                    className="bg-red-500 text-white hover:bg-red-600 px-3 py-1.5 text-sm rounded"
+                                                    className="bg-indigo-600 text-white hover:bg-indigo-700 px-3 py-1.5 text-sm rounded"
                                                 >
                                                     Add
                                                 </Button>
@@ -231,7 +230,7 @@ const ContentManagerPage = () => {
                                         key={page}
                                         onClick={() => handlePageChange(page)}
                                         className={`flex items-center justify-center w-10 h-10 rounded-lg ${currentPage === page
-                                            ? "bg-blue-500 text-white"
+                                            ? "bg-indigo-600 text-white"
                                             : "text-gray-600 border border-gray-200 hover:bg-gray-50"
                                             }`}
                                     >

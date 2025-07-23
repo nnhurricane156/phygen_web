@@ -1,7 +1,8 @@
 import type React from "react";
+import type { ReactNode } from "react";
 
 interface CheckboxProps {
-  label?: string;
+  label?: string | ReactNode;
   checked: boolean;
   className?: string;
   id?: string;
@@ -19,15 +20,19 @@ const Checkbox: React.FC<CheckboxProps> = ({
 }) => {
   return (
     <label
-      className={`flex items-center space-x-3 group cursor-pointer ${
-        disabled ? "cursor-not-allowed opacity-60" : ""
-      }`}
+      className={`flex items-center space-x-3 group cursor-pointer ${disabled ? "cursor-not-allowed opacity-60" : ""
+        }`}
     >
       <div className="relative w-5 h-5">
         <input
           id={id}
           type="checkbox"
-          className={`w-5 h-5 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-brand-500 disabled:opacity-60 
+          className={`w-5 h-5 appearance-none cursor-pointer border-2 border-gray-300 dark:border-gray-600 rounded-md 
+          bg-white dark:bg-gray-800 
+          checked:bg-indigo-600 checked:border-indigo-600 
+          focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+          disabled:opacity-60 disabled:cursor-not-allowed
+          transition-colors duration-200
           ${className}`}
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
@@ -71,9 +76,9 @@ const Checkbox: React.FC<CheckboxProps> = ({
         )}
       </div>
       {label && (
-        <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+        <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
           {label}
-        </span>
+        </div>
       )}
     </label>
   );
