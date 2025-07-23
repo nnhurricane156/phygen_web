@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { InlineMath, BlockMath } from "react-katex";
+import "katex/dist/katex.min.css";
 import {
   Table,
   TableBody,
@@ -8,6 +10,39 @@ import {
   TableRow,
 } from "@/components/ui/table/index";
 import { Modal } from "@/components/ui/modal/index";
+
+// Helper function to render text with LaTeX math expressions
+const renderMathText = (text: string) => {
+    if (!text) return null;
+    
+    // Split text by LaTeX delimiters
+    const parts = text.split(/(\$[^$]+\$|\$\$[^$]+\$\$)/);
+    
+    return parts.map((part, index) => {
+        if (part.match(/^\$\$.*\$\$$/)) {
+            // Block math (display mode)
+            const math = part.slice(2, -2);
+            try {
+                return <BlockMath key={index} math={math} />;
+            } catch (error) {
+                console.warn('KaTeX error for block math:', math, error);
+                return <span key={index} className="text-red-500">{part}</span>;
+            }
+        } else if (part.match(/^\$.*\$$/)) {
+            // Inline math
+            const math = part.slice(1, -1);
+            try {
+                return <InlineMath key={index} math={math} />;
+            } catch (error) {
+                console.warn('KaTeX error for inline math:', math, error);
+                return <span key={index} className="text-red-500">{part}</span>;
+            }
+        } else {
+            // Regular text
+            return <span key={index}>{part}</span>;
+        }
+    });
+};
 
 interface Question {
   id: number;
@@ -553,13 +588,13 @@ const ExamPage = () => {
                     />
                     <div className="flex-1">
                       <div className="font-medium text-gray-900 mb-2">
-                        {question.questionText}
+                        {renderMathText(question.questionText)}
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                        <div>A) {question.optionA}</div>
-                        <div>B) {question.optionB}</div>
-                        <div>C) {question.optionC}</div>
-                        <div>D) {question.optionD}</div>
+                        <div>A) {renderMathText(question.optionA)}</div>
+                        <div>B) {renderMathText(question.optionB)}</div>
+                        <div>C) {renderMathText(question.optionC)}</div>
+                        <div>D) {renderMathText(question.optionD)}</div>
                       </div>
                       <div className="mt-2 text-xs text-gray-500">
                         Correct Answer: Option {question.correctAnswer} | Subject: {question.subject}

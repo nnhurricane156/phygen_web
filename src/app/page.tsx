@@ -4,6 +4,7 @@ import Button from "@/components/ui/button/Button";
 import Link from "next/link";
 import HeaderAuth from "@/components/header/HeaderAuth";
 import ExamGenerator from "@/components/exam/ExamGenerator";
+import OCRFeature from "@/components/exam/OCRFeature";
 
 // Mock data for physics topics
 const physicsTopics = [
@@ -49,20 +50,20 @@ const physicsTopics = [
 const examSuccessStories = [
   {
     id: 1,
-    text: "Generated 5 physics exams for my Grade 11 class on Mechanics. Students loved the variety of questions!",
+    text: "Generated 5 physics exams for my class on Mechanics. Students loved the variety of questions!",
     username: "Ms. Sarah Chen",
     role: "Physics Teacher",
-    tags: ["Mechanics", "Grade 11", "Teaching"],
-    examType: "Mechanics - Grade 11",
+    tags: ["Mechanics", "Teaching"],
+    examType: "Mechanics",
     questionsGenerated: 50
   },
   {
     id: 2,
     text: "Used PhyGen to create practice tests for my upcoming physics finals. The difficulty progression was perfect!",
     username: "Alex Kumar",
-    role: "Grade 12 Student", 
-    tags: ["Finals Prep", "Practice Tests", "Grade 12"],
-    examType: "Mixed Topics - Grade 12",
+    role: "High School Student", 
+    tags: ["Finals Prep", "Practice Tests"],
+    examType: "Mixed Topics",
     questionsGenerated: 75
   },
   {
@@ -71,7 +72,7 @@ const examSuccessStories = [
     username: "Dr. Michael Torres",
     role: "High School Principal",
     tags: ["Thermodynamics", "Differentiated Learning"],
-    examType: "Thermodynamics - All Grades",
+    examType: "Thermodynamics",
     questionsGenerated: 60
   },
 ];
@@ -89,7 +90,7 @@ const physicsExamReviews = [
   {
     id: 2,
     name: "James Miller",
-    role: "Grade 12 Student",
+    role: "High School Student",
     rating: 5,
     comment: "Used this to practice for my physics finals. The difficulty levels helped me progress from basic to advanced concepts.",
     examsFocused: "Mixed Topics Practice"
@@ -163,12 +164,12 @@ export default function Home() {
             >
               Home
             </a>
-            <a
-              href="#"
+            <Link
+              href="/features"
               className="text-gray-600 hover:text-indigo-700 font-medium"
             >
               Features
-            </a>
+            </Link>
             <a
               href="#"
               className="text-gray-600 hover:text-indigo-700 font-medium"
@@ -204,7 +205,7 @@ export default function Home() {
             <Link href="/createExam" className="px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-700 text-base font-medium rounded-md transition-colors">
               Generate Exam Now
             </Link>
-            <button className="px-6 py-3 bg-indigo-100 border border-indigo-200 text-indigo-700 hover:bg-indigo-200 text-base font-medium rounded-md shadow-sm">
+            <button className="cursor-pointer px-6 py-3 bg-indigo-100 border border-indigo-200 text-indigo-700 hover:bg-indigo-200 text-base font-medium rounded-md shadow-sm">
               View Sample Questions
             </button>
           </div>
@@ -220,8 +221,8 @@ export default function Home() {
               <div className="text-sm text-gray-600">Topics Covered</div>
             </div>
             <div className="bg-white p-3 rounded-lg border border-indigo-100">
-              <div className="text-2xl font-bold text-indigo-600">3</div>
-              <div className="text-sm text-gray-600">Grade Levels</div>
+              <div className="text-2xl font-bold text-indigo-600">4</div>
+              <div className="text-sm text-gray-600">Difficulty Levels</div>
             </div>
           </div>
         </div>
@@ -243,7 +244,7 @@ export default function Home() {
                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                 </svg>
-                Grade 10-12 Questions
+                High School Questions
               </div>
             </div>
           </div>
@@ -255,7 +256,7 @@ export default function Home() {
         <h2 className="text-2xl font-bold text-indigo-900 mb-8 text-center">
           Physics Exam Features
         </h2>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="flex flex-col items-center p-6 border border-indigo-100 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 bg-white hover:bg-indigo-50">
             <div className="w-16 h-16 bg-indigo-100 rounded-full mb-4 flex items-center justify-center">
               <svg
@@ -300,7 +301,7 @@ export default function Home() {
               Difficulty Levels
             </h3>
             <p className="text-center text-gray-600">
-              Choose from Easy, Medium, or Hard difficulty levels suitable for Grade 10, 11, and 12 students.
+              Choose from Easy, Medium, Hard, or Expert difficulty levels suitable for high school students.
             </p>
           </div>
           <div className="flex flex-col items-center p-6 border border-indigo-100 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 bg-white hover:bg-indigo-50">
@@ -328,7 +329,41 @@ export default function Home() {
               Get your custom physics exam generated instantly with answer keys and detailed solutions.
             </p>
           </div>
+          <div className="flex flex-col items-center p-6 border border-indigo-100 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 bg-white hover:bg-indigo-50">
+            <div className="w-16 h-16 bg-purple-100 rounded-full mb-4 flex items-center justify-center">
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="text-purple-700"
+              >
+                <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-indigo-900 mb-2">
+              OCR Question Extraction
+            </h3>
+            <p className="text-center text-gray-600">
+              Upload images or PDFs to automatically extract physics questions using advanced AI technology.
+            </p>
+          </div>
         </div>
+      </section>
+
+      {/* OCR Feature Section */}
+      <section className="mb-16">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-indigo-900 mb-2">
+            Smart Question Extraction
+          </h2>
+          <p className="text-indigo-700">
+            Upload images or PDFs to automatically extract physics questions using advanced OCR and AI technology
+          </p>
+        </div>
+        <OCRFeature />
       </section>
 
       {/* Topic input section */}
@@ -441,7 +476,7 @@ export default function Home() {
           
           <div className="text-center mt-8">
             <Link href="/createExam" className="inline-block">
-              <button className="px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-700 rounded-md font-medium">
+              <button className="cursor-pointer px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-700 rounded-md font-medium">
                 Create Your Physics Exam
               </button>
             </Link>
@@ -511,12 +546,12 @@ export default function Home() {
         </p>        
         <div className="flex justify-center gap-4 mb-6">
           <Link href="/createExam">
-            <button className="px-8 py-3 bg-white text-indigo-700 hover:bg-indigo-50 text-base font-medium rounded-md">
+            <button className="cursor-pointer px-8 py-3 bg-white text-indigo-700 hover:bg-indigo-50 text-base font-medium rounded-md">
               Generate Your First Exam
             </button>
           </Link>
           <Link href="/register">
-            <button className="px-8 py-3 bg-indigo-500 text-white border border-indigo-400 hover:bg-indigo-500 text-base font-medium rounded-md shadow-md">
+            <button className="cursor-pointer px-8 py-3 bg-indigo-500 text-white border border-indigo-400 hover:bg-indigo-500 text-base font-medium rounded-md shadow-md">
               Sign Up Free
             </button>
           </Link>
@@ -528,8 +563,8 @@ export default function Home() {
             <div className="text-indigo-200 text-sm">Questions</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-white">15</div>
-            <div className="text-indigo-200 text-sm">Topics</div>
+            <div className="text-2xl font-bold text-white">4</div>
+            <div className="text-indigo-200 text-sm">Difficulty Levels</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-white">Free</div>
@@ -560,7 +595,7 @@ export default function Home() {
               <li><Link href="/createExam" className="text-gray-600 hover:text-indigo-700">Create Exam</Link></li>
               <li><a href="#" className="text-gray-600 hover:text-indigo-700">Question Bank</a></li>
               <li><a href="#" className="text-gray-600 hover:text-indigo-700">Teaching Resources</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-indigo-700">Grade Levels</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-indigo-700">Difficulty Levels</a></li>
             </ul>
           </div>
           <div>

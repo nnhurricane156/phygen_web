@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Dropdown from "../common/Dropdown";
-import { logoutUser } from "@/actions/auth"; // Adjust the import path as necessary
+import { useAuth } from "@/context/AuthContext"; // Use AuthContext for logout
 
 export default function AdminUserDropdown() {
     const [isOpen, setIsOpen] = useState(false);
+    const { logout } = useAuth(); // Get logout function from AuthContext
 
     function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         e.stopPropagation();
@@ -18,11 +19,16 @@ export default function AdminUserDropdown() {
         setIsOpen(false);
     }
 
+    function handleLogout() {
+        logout();
+        closeDropdown();
+    }
+
     return (
         <div className="relative">
             <button
                 onClick={toggleDropdown}
-                className="flex items-center text-gray-700 dropdown-toggle"
+                className="cursor-pointer flex items-center text-gray-700 dropdown-toggle"
             >
                 <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
                     <Image
@@ -61,14 +67,27 @@ export default function AdminUserDropdown() {
             >
                 <div className="mb-2">
                     <span className="block font-medium text-gray-800 text-lg">
-                        Admin User
+                        Nam Phong Nguyễn
                     </span>
                     <span className="mt-0.5 block text-sm text-gray-500">
-                        admin@example.com
+                        phongnguyenc4156@gmail.com
                     </span>
                 </div>
 
                 <ul className="flex flex-col gap-2 py-3 border-b border-gray-200">
+                    <li>
+                        <Link
+                            href="/admin"
+                            className="flex items-center gap-2 py-1.5 text-gray-600 hover:text-gray-900 text-sm"
+                            onClick={closeDropdown}
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M9 22V12H15V22" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span className="underline">Dashboard</span>
+                        </Link>
+                    </li>
                     <li>
                         <Link
                             href="/admin/profile"
@@ -80,6 +99,18 @@ export default function AdminUserDropdown() {
                                 <path d="M16.6666 16.6667C16.6666 14.8258 15.9553 13.0603 14.7676 11.8726C13.5798 10.6849 11.8144 9.97368 9.99998 9.97368C8.18556 9.97368 6.42011 10.6849 5.23236 11.8726C4.04461 13.0603 3.33331 14.8258 3.33331 16.6667" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                             <span className="underline">View Profile</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            href="/examHistory"
+                            className="flex items-center gap-2 py-1.5 text-gray-600 hover:text-gray-900 text-sm"
+                            onClick={closeDropdown}
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 12H15M9 16H15M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12.5858C12.851 3 13.1054 3.10536 13.2929 3.29289L19.7071 9.70711C19.8946 9.89464 20 10.149 20 10.4142V19C20 20.1046 19.1046 21 18 21H17ZM17 21V11H13C12.4477 11 12 10.5523 12 10V3" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span className="underline">Exam History</span>
                         </Link>
                     </li>
                     <li>
@@ -99,7 +130,7 @@ export default function AdminUserDropdown() {
                 <Link
                     href="/login"
                     className="flex items-center gap-2 py-2 mt-3 text-gray-600 hover:text-gray-900 text-sm"
-                    onClick={() => logoutUser()}
+                    onClick={handleLogout}
                 >
                     <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H6.5C5.09987 2.5 4.3998 2.5 3.86502 2.77248C3.39462 3.01217 3.01217 3.39462 2.77248 3.86502C2.5 4.3998 2.5 5.09987 2.5 6.5V13.5C2.5 14.9001 2.5 15.6002 2.77248 16.135C3.01217 16.6054 3.39462 16.9878 3.86502 17.2275C4.3998 17.5 5.09987 17.5 6.5 17.5H7.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

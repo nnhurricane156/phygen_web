@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { logoutAction } from "@/actions/auth";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 interface UserMenuProps {
     user: {
@@ -16,20 +15,15 @@ interface UserMenuProps {
 export default function UserMenu({ user }: UserMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
-    const router = useRouter();
+    const { logout } = useAuth();
 
     // Fix hydration mismatch
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    const handleLogout = async () => {
-        try {
-            await logoutAction();
-            router.push("/login");
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
+    const handleLogout = () => {
+        logout();
     };
 
     const getUserRoleName = (role: number) => {
@@ -54,7 +48,7 @@ export default function UserMenu({ user }: UserMenuProps) {
         <div className="relative">
             <button
                 onClick={() => isMounted && setIsOpen(!isOpen)}
-                className="flex items-center space-x-3 text-gray-700 hover:text-indigo-700 font-medium"
+                className="cursor-pointer flex items-center space-x-3 text-gray-700 hover:text-indigo-700 font-medium"
             >
                 <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
                     {user.name.charAt(0).toUpperCase()}
@@ -84,9 +78,23 @@ export default function UserMenu({ user }: UserMenuProps) {
                     >
                         Dashboard
                     </Link>
+                    <Link
+                        href="/features"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        Features
+                    </Link>
+                    <Link
+                        href="/examHistory"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        Exam History
+                    </Link>
                     <button
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                        className="cursor-pointer block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                     >
                         Logout
                     </button>

@@ -1,37 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 import UserMenu from "./UserMenu";
 
-interface Session {
-    userId: string;
-    email: string;
-    name: string;
-    role: number;
-}
-
 export default function HeaderAuth() {
-    const [session, setSession] = useState<Session | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        // Check session on client side
-        const checkSession = async () => {
-            try {
-                const response = await fetch('/api/auth/session');
-                if (response.ok) {
-                    const sessionData = await response.json();
-                    setSession(sessionData);
-                }
-            } catch (error) {
-                console.error('Error checking session:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        checkSession();
-    }, []);
+    const { isAuthenticated, user, isLoading } = useAuth();
 
     // Show loading state
     if (isLoading) {
@@ -44,31 +17,32 @@ export default function HeaderAuth() {
         );
     }
 
-    if (session?.userId) {
+    if (isAuthenticated && user) {
         return (
             <UserMenu
                 user={{
-                    name: session.name || "User",
-                    email: session.email || "",
-                    role: session.role || 2,
+                    name: user.username || "User",
+                    email: user.email || "",
+                    role: user.role || 2,
                 }}
             />
         );
     }
 
     return (
-        <div className="flex items-center space-x-3">              <Link
+        <div className="flex items-center space-x-3">
+            <Link
                 href="/login"
                 className="px-4 py-2 text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50 font-medium"
-              >
+            >
                 Login
-              </Link>
-              <Link
+            </Link>
+            <Link
                 href="/register"
                 className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium"
-              >
+            >
                 Register
-              </Link>
+            </Link>
         </div>
     );
 }

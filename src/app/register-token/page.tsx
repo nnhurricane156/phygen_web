@@ -29,7 +29,8 @@ export default function TokenRegisterForm() {
     // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated && user && isMounted) {
-            router.push('/'); // Always redirect to home page
+            const redirectPath = getRedirectPath(user.role);
+            router.push(redirectPath);
         }
     }, [isAuthenticated, user, router, isMounted]);
 
@@ -83,7 +84,7 @@ export default function TokenRegisterForm() {
             
             // Redirect to login after 2 seconds
             setTimeout(() => {
-                router.push('/login?message=' + encodeURIComponent("Registration successful! Please login with your credentials."));
+                router.push('/login-token?message=' + encodeURIComponent("Registration successful! Please login with your credentials."));
             }, 2000);
             
         } catch (error: any) {
@@ -157,7 +158,8 @@ export default function TokenRegisterForm() {
                                 <GoogleLoginButton 
                                     variant="register"
                                     onSuccess={(role) => {
-                                        router.push('/'); // Always redirect to home page
+                                        const redirectPath = getRedirectPath(role);
+                                        router.push(redirectPath);
                                     }}
                                     onError={(error) => {
                                         setErrors({
@@ -256,7 +258,7 @@ export default function TokenRegisterForm() {
                                         <button
                                             type="submit"
                                             disabled={isLoading}
-                                            className="cursor-pointer w-full py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-full py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {isLoading ? "Creating Account..." : "Sign Up"}
                                         </button>
@@ -268,7 +270,7 @@ export default function TokenRegisterForm() {
                                 <p className="text-sm text-center text-gray-600">
                                     Already have an account? {" "}
                                     <Link
-                                        href="/login"
+                                        href="/login-token"
                                         className="text-blue-500 hover:text-blue-700 font-medium"
                                     >
                                         Sign In

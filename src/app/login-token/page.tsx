@@ -8,17 +8,17 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import SuccessMessage from "@/components/ui/SuccessMessage";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 
-export default function TokenRegisterForm() {
+export default function TokenLoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [successMessage, setSuccessMessage] = useState("");
     
-    const { register, isAuthenticated, user } = useAuth();
+    const { login, isAuthenticated, user } = useAuth();
     const router = useRouter();
 
     // Fix hydration mismatch
@@ -29,7 +29,8 @@ export default function TokenRegisterForm() {
     // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated && user && isMounted) {
-            router.push('/'); // Always redirect to home page
+            const redirectPath = getRedirectPath(user.role);
+            router.push(redirectPath);
         }
     }, [isAuthenticated, user, router, isMounted]);
 
@@ -46,62 +47,36 @@ export default function TokenRegisterForm() {
         e.preventDefault();
         
         const formData = new FormData(e.currentTarget);
-        const userName = formData.get('userName') as string;
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
 
-        // Clear previous errors and success message
+        // Clear previous errors
         setErrors({});
-        setSuccessMessage("");
         setIsLoading(true);
 
         try {
             // Basic validation
-            const newErrors: Record<string, string> = {};
-            
-            if (!userName || !/^[a-zA-Z]+$/.test(userName)) {
-                newErrors.userName = 'Username must contain only letters (no numbers or special characters)';
-            }
-            
             if (!email || !email.includes('@')) {
-                newErrors.email = 'Please enter a valid email address';
+                setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
+                return;
             }
             
-            if (!password || password.length < 1) {
-                newErrors.password = 'Password is required';
-            }
-
-            if (Object.keys(newErrors).length > 0) {
-                setErrors(newErrors);
+            if (!password || password.length < 6) {
+                setErrors(prev => ({ ...prev, password: 'Password must be at least 6 characters long' }));
                 return;
             }
 
-            await register(userName, email, password);
+            await login(email, password);
             
-            // Registration successful
-            setSuccessMessage("Registration successful! You can now login with your credentials.");
-            
-            // Redirect to login after 2 seconds
-            setTimeout(() => {
-                router.push('/login?message=' + encodeURIComponent("Registration successful! Please login with your credentials."));
-            }, 2000);
+            // Login successful - AuthContext will handle the redirect
             
         } catch (error: any) {
-            console.error('Registration error:', error);
-            const errorMessage = error.message || 'Registration failed. Please try again.';
-            
-            // Handle specific API errors
-            if (error.message.includes('email')) {
-                setErrors({ email: errorMessage });
-            } else if (error.message.includes('username')) {
-                setErrors({ userName: errorMessage });
-            } else {
-                setErrors({
-                    email: errorMessage,
-                    userName: errorMessage,
-                    password: errorMessage
-                });
-            }
+            console.error('Login error:', error);
+            const errorMessage = error.message || 'Invalid email or password';
+            setErrors({
+                email: errorMessage,
+                password: errorMessage
+            });
         } finally {
             setIsLoading(false);
         }
@@ -119,7 +94,6 @@ export default function TokenRegisterForm() {
                             <div className="h-10 bg-gray-200 rounded"></div>
                             <div className="h-10 bg-gray-200 rounded"></div>
                             <div className="h-10 bg-gray-200 rounded"></div>
-                            <div className="h-10 bg-gray-200 rounded"></div>
                         </div>
                     </div>
                 </div>
@@ -129,7 +103,7 @@ export default function TokenRegisterForm() {
 
     return (
         <div className="flex h-screen bg-white justify-center items-center">
-            {/* Centered signup form with border */}
+            {/* Centered login form with border */}
             <div className="flex flex-col w-full max-w-md bg-white px-6 py-8 sm:px-8 rounded-xl shadow-lg border border-gray-200 mx-4">
                 <div className="flex flex-col w-full">
                     <div className="w-full">
@@ -141,33 +115,27 @@ export default function TokenRegisterForm() {
                         </Link>
                         <div className="mb-8 text-center">
                             <h1 className="mb-2 text-2xl font-semibold text-gray-800">
-                                Sign Up
+                                Sign In
                             </h1>
                             <p className="text-sm text-gray-500">
-                                Enter your email and password to sign up!
+                                Enter your email and password to sign in!
                             </p>
-                            {successMessage && (
-                                <div className="mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-md">
-                                    {successMessage}
-                                </div>
-                            )}
+                            <SuccessMessage />
                         </div>
                         <div>
                             <div className="flex justify-center w-full">
                                 <GoogleLoginButton 
-                                    variant="register"
                                     onSuccess={(role) => {
-                                        router.push('/'); // Always redirect to home page
+                                        const redirectPath = getRedirectPath(role);
+                                        router.push(redirectPath);
                                     }}
                                     onError={(error) => {
                                         setErrors({
                                             email: error,
-                                            userName: error,
                                             password: error
                                         });
                                     }}
                                     disabled={isLoading}
-                                    className="w-full"
                                 />
                             </div>
                             <div className="relative py-4">
@@ -184,27 +152,11 @@ export default function TokenRegisterForm() {
                                 <div className="space-y-4">
                                     <div>
                                         <Label>
-                                            Username <span className="text-red-500">*</span>
-                                        </Label>
-                                        <Input
-                                            name="userName"
-                                            placeholder="Enter your username"
-                                            type="text"
-                                            className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
-                                            disabled={isLoading}
-                                        />
-                                        <p className="text-xs text-gray-500 mt-1">Only letters allowed (no numbers or special characters)</p>
-                                        {errors.userName && (
-                                            <p className="text-red-500 text-sm mt-1">{errors.userName}</p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <Label>
                                             Email <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             name="email"
-                                            placeholder="Enter your email"
+                                            placeholder="info@gmail.com"
                                             type="email"
                                             className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400"
                                             disabled={isLoading}
@@ -240,25 +192,27 @@ export default function TokenRegisterForm() {
                                             <p className="text-red-500 text-sm mt-1">{errors.password}</p>
                                         )}
                                     </div>
-                                    <div className="flex items-start gap-3">
-                                        <Checkbox
-                                            id="terms-checkbox"
-                                            checked={isChecked}
-                                            onChange={setIsChecked}
-                                            label={
-                                                <span className="text-sm text-gray-700">
-                                                    By creating an account means you agree to the <Link href="/terms" className="text-blue-600 font-medium">Terms and Conditions</Link>, and our <Link href="/privacy" className="text-blue-600 font-medium">Privacy Policy</Link>
-                                                </span>
-                                            }
-                                        />
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox checked={isChecked} onChange={setIsChecked} />
+                                            <span className="text-sm text-gray-700">
+                                                Keep me logged in
+                                            </span>
+                                        </div>
+                                        <Link
+                                            href="/reset-password"
+                                            className="text-sm text-blue-600 hover:text-blue-700"
+                                        >
+                                            Forgot password?
+                                        </Link>
                                     </div>
                                     <div>
                                         <button
                                             type="submit"
                                             disabled={isLoading}
-                                            className="cursor-pointer w-full py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-full py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            {isLoading ? "Creating Account..." : "Sign Up"}
+                                            {isLoading ? "Signing In..." : "Sign In"}
                                         </button>
                                     </div>
                                 </div>
@@ -266,12 +220,12 @@ export default function TokenRegisterForm() {
 
                             <div className="mt-6">
                                 <p className="text-sm text-center text-gray-600">
-                                    Already have an account? {" "}
+                                    Don&apos;t have an account? {" "}
                                     <Link
-                                        href="/login"
+                                        href="/register-token"
                                         className="text-blue-500 hover:text-blue-700 font-medium"
                                     >
-                                        Sign In
+                                        Sign Up
                                     </Link>
                                 </p>
                             </div>

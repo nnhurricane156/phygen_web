@@ -86,7 +86,7 @@ const ContentManagerPage = () => {
     }; return (
         <div className="container mx-auto px-4 py-8">
             <div className="flex items-center mb-6">
-                <button className="mr-3">
+                <button className="cursor-pointer mr-3">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         className="text-gray-700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 12H5M12 19l-7-7 7-7" />
