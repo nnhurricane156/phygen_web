@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -7,92 +7,122 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/index";
+import Badge from "@/components/ui/badge/Badge";
 import { Modal } from "@/components/ui/modal/index";
+import Link from "next/link";
+import { 
+  getAllUsers, 
+  deactivateUser,
+  type AdminUserData, 
+  type UsersQueryParams,
+  type PaginatedResponse 
+} from "@/lib/api";
 import Image from "next/image";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: "Active" | "Inactive";
-  image: string;
-  lastLogin: string;
-  created_at?: string;
-}
+// Remove the local User interface and use AdminUserData from API instead
 
-// Mock data - dữ liệu ảo để làm việc
-const mockUsers: User[] = [
+// Mock data - using AdminUserData structure
+const mockUsers: AdminUserData[] = [
   {
-    id: 1,
-    name: "Nguyễn Văn An",
-    email: "nguyenvanan@example.com",
-    role: "Admin",
-    status: "Active",
-    image: "/images/user/user-01.jpg",
-    lastLogin: "2024-12-15 09:43",
-    created_at: "2024-01-01"
+    id: "1",
+    username: "Admin User",
+    email: "admin@phygen.com",
+    role: 0, // 0 = Admin
+    status: 1, // 1 = Active
+    createdAt: "2024-01-15",
+    isProvider: false,
+    identityId: "1"
   },
   {
-    id: 2,
-    name: "Trần Thị Bình",
-    email: "tranthibinh@example.com",
-    role: "Teacher",
-    status: "Active",
-    image: "/images/user/user-02.jpg",
-    lastLogin: "2024-12-14 15:20",
-    created_at: "2024-01-02"
+    id: "2", 
+    username: "Teacher John",
+    email: "john@phygen.com",
+    role: 1, // 1 = Teacher  
+    status: 1, // 1 = Active
+    createdAt: "2024-01-20",
+    isProvider: false,
+    identityId: "2"
   },
   {
-    id: 3,
-    name: "Lê Hoàng Châu",
-    email: "lehoangchau@example.com",
-    role: "Student",
-    status: "Inactive",
-    image: "/images/user/user-03.jpg",
-    lastLogin: "2024-12-10 11:35",
-    created_at: "2024-01-03"
+    id: "3",
+    username: "Student Alice", 
+    email: "alice@phygen.com",
+    role: 2, // 2 = Student
+    status: 0, // 0 = Inactive
+    createdAt: "2024-01-25",
+    isProvider: false,
+    identityId: "3"
   },
   {
-    id: 4,
-    name: "Phạm Minh Đức",
-    email: "phamminhduc@example.com",
-    role: "Student",
-    status: "Active",
-    image: "/images/user/user-04.jpg",
-    lastLogin: "2024-12-14 08:15",
-    created_at: "2024-01-04"
-  },
+    id: "4",
+    username: "Student Bob",
+    email: "bob@phygen.com", 
+    role: 2, // 2 = Student
+    status: 1, // 1 = Active
+    createdAt: "2024-02-01",
+    isProvider: false,
+    identityId: "4"
+  }
 ];
 
 const UsersPage = () => {
   // State for users data
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<AdminUserData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingUser, setEditingUser] = useState<AdminUserData | null>(null);
   
   // State for search and pagination
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const itemsPerPage = 10;
 
   // Form state
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
-    role: "Student",
-    status: "Active" as "Active" | "Inactive",
-    image: "/images/user/user-01.jpg"
+    role: 2, // Student role
+    status: 1, // Active status
   });
 
-  // Filter users based on search
+  // Fetch users from API
   useEffect(() => {
-    const filtered = users.filter(user =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredUsers(filtered);
-  }, [users, searchTerm]);
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getAllUsers({ 
+          pageNumber: currentPage, 
+          pageSize: itemsPerPage 
+        });
+        setUsers(response.items.$values || []);
+        setTotalPages(response.totalPages);
+        setTotalCount(response.totalCount);
+      } catch (err) {
+        // console.error('❌ Error fetching users:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load users');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [currentPage]);
+
+  // Filter users based on search term (client-side for now)
+  const filteredUsers = users.filter(
+    (user) =>
+      user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.role?.toString().includes(searchTerm.toLowerCase())
+  );
+
+  // Use filtered users for display
+  const paginatedUsers = filteredUsers;
 
   // Function to handle search input changes
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,24 +130,22 @@ const UsersPage = () => {
   };
 
   // Open modal for create/edit
-  const openModal = (user?: User) => {
+  const openModal = (user?: AdminUserData) => {
     if (user) {
       setEditingUser(user);
       setFormData({
-        name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role,
         status: user.status,
-        image: user.image
       });
     } else {
       setEditingUser(null);
       setFormData({
-        name: "",
+        username: "",
         email: "",
-        role: "Student",
-        status: "Active",
-        image: "/images/user/user-01.jpg"
+        role: 2, // Student
+        status: 1, // Active
       });
     }
     setIsModalOpen(true);
@@ -128,11 +156,10 @@ const UsersPage = () => {
     setIsModalOpen(false);
     setEditingUser(null);
     setFormData({
-      name: "",
+      username: "",
       email: "",
-      role: "Student", 
-      status: "Active",
-      image: "/images/user/user-01.jpg"
+      role: 2, // Student role (number)
+      status: 1, // Active status (number)
     });
   };
 
@@ -156,17 +183,20 @@ const UsersPage = () => {
           ? { 
               ...user, 
               ...formData,
-              lastLogin: user.lastLogin // Keep existing last login
+              createdAt: user.createdAt, // Keep existing creation date
+              isProvider: user.isProvider, // Keep existing provider status  
+              identityId: user.identityId // Keep existing identity ID
             }
           : user
       ));
     } else {
       // Create new user
-      const newUser: User = {
-        id: Math.max(...users.map(u => u.id)) + 1,
+      const newUser: AdminUserData = {
+        id: Date.now().toString(), // Use timestamp as string ID
         ...formData,
-        lastLogin: "Chưa đăng nhập",
-        created_at: new Date().toISOString().split('T')[0]
+        createdAt: new Date().toISOString().split('T')[0],
+        isProvider: false,
+        identityId: Date.now().toString()
       };
       setUsers(prev => [newUser, ...prev]);
     }
@@ -175,7 +205,7 @@ const UsersPage = () => {
   };
 
   // Handle delete
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     if (confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
       setUsers(prev => prev.filter(user => user.id !== id));
     }
@@ -205,8 +235,40 @@ const UsersPage = () => {
         />
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="bg-white rounded-lg shadow p-8">
+          <div className="flex justify-center items-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <span className="ml-3 text-gray-600">Loading users...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div className="bg-white rounded-lg shadow p-8">
+          <div className="text-center">
+            <div className="text-red-600 mb-4">
+              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Error loading users</h3>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      {!loading && !error && (
+        <div className="bg-white rounded-lg shadow overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
@@ -233,21 +295,17 @@ const UsersPage = () => {
 
           {/* Table Body */}
           <TableBody>
-            {filteredUsers.map((user, index) => (
+            {paginatedUsers.map((user, index) => (
               <TableRow key={user.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                 <TableCell className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 overflow-hidden rounded-full">
-                      <Image
-                        width={40}
-                        height={40}
-                        src={user.image}
-                        alt={user.name}
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                      <span className="text-indigo-600 font-medium">
+                        {user.username?.charAt(0).toUpperCase() || 'U'}
+                      </span>
                     </div>
                     <div className="text-sm font-medium text-gray-900">
-                      {user.name}
+                      {user.username}
                     </div>
                   </div>
                 </TableCell>
@@ -256,28 +314,28 @@ const UsersPage = () => {
                 </TableCell>
                 <TableCell className="px-6 py-4 text-sm text-gray-900">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    user.role === "Admin" 
+                    user.role === 1 
                       ? "bg-purple-100 text-purple-800"
-                      : user.role === "Teacher"
-                      ? "bg-blue-100 text-blue-800" 
-                      : "bg-green-100 text-green-800"
+                      : user.role === 0
+                      ? "bg-yellow-100 text-yellow-800" 
+                      : "bg-blue-100 text-blue-800"
                   }`}>
-                    {user.role}
+                    {user.role === 1 ? "Quản trị viên" : user.role === 0 ? "Giáo viên" : "Học sinh"}
                   </span>
                 </TableCell>
                 <TableCell className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.status === "Active"
+                      user.status === 1
                         ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
+                        : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {user.status === "Active" ? "Hoạt động" : "Không hoạt động"}
+                    {user.status === 1 ? "Hoạt động" : "Không hoạt động"}
                   </span>
                 </TableCell>
                 <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {user.lastLogin}
+                  {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}
                 </TableCell>
                 <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex gap-2">
@@ -299,7 +357,9 @@ const UsersPage = () => {
             ))}
           </TableBody>
         </Table>
-      </div>
+        </div>
+      )}
+
       {/* Create/Edit User Modal */}
       <Modal isOpen={isModalOpen} onClose={closeModal} showCloseButton={false}>
         <div className="bg-white rounded-lg w-full max-w-md mx-auto">
@@ -338,8 +398,8 @@ const UsersPage = () => {
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="username"
+                  value={formData.username}
                   onChange={handleInputChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -392,24 +452,6 @@ const UsersPage = () => {
                 >
                   <option value="Active">Hoạt động</option>
                   <option value="Inactive">Không hoạt động</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ảnh đại diện
-                </label>
-                <select
-                  name="image"
-                  value={formData.image}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="/images/user/user-01.jpg">Avatar 1</option>
-                  <option value="/images/user/user-02.jpg">Avatar 2</option>
-                  <option value="/images/user/user-03.jpg">Avatar 3</option>
-                  <option value="/images/user/user-04.jpg">Avatar 4</option>
-                  <option value="/images/user/user-05.jpg">Avatar 5</option>
                 </select>
               </div>
             </div>

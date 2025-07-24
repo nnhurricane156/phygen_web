@@ -64,7 +64,7 @@ export default function ExamDetailsPage() {
                 setError(null);
                 const questions = await getExamQuestions(examId);
                 setExamQuestions(questions);
-                console.log('✅ Exam questions loaded:', questions);
+                // console.log('✅ Exam questions loaded:', questions);
             } catch (err) {
                 console.error('❌ Error loading exam questions:', err);
                 setError(err instanceof Error ? err.message : 'Failed to load exam questions');

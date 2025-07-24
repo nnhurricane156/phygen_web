@@ -74,15 +74,15 @@ const ContentManagerPage = () => {
 
     // Action handlers for the red buttons
     const handleEdit = (id: number): void => {
-        console.log(`Edit item ${id}`);
+        // console.log(`Edit item ${id}`);
     };
 
     const handleDelete = (id: number): void => {
-        console.log(`Delete item ${id}`);
+        // console.log(`Delete item ${id}`);
     };
 
     const handleAdd = (): void => {
-        console.log("Add new item");
+        // console.log("Add new item");
     }; return (
         <div className="container mx-auto px-4 py-8">
             <div className="flex items-center mb-6">

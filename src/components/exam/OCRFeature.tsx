@@ -51,6 +51,8 @@ export default function OCRFeature({ onQuestionsExtracted }: OCRFeatureProps) {
     const [topics, setTopics] = useState<Topic[]>([]);
     const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
     const [questionStates, setQuestionStates] = useState<{ [key: string]: { chapterId: number; topicId: number; difficulty: number; saving: boolean; saved: boolean } }>({});
+    const [lastProcessedFile, setLastProcessedFile] = useState<File | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null); // Track selected file before processing
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Load chapters on mount
@@ -194,28 +196,47 @@ export default function OCRFeature({ onQuestionsExtracted }: OCRFeatureProps) {
         }
     };
 
-    // Handle file selection
-    const handleFileChange = async (file: File) => {
+    // Handle file selection (sets preview, doesn't process immediately)
+    const handleFileSelection = async (file: File) => {
         if (!file) return;
 
         // Validate file type
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
         if (!allowedTypes.includes(file.type)) {
-            setError('Please upload a valid image (JPG, PNG) or PDF file.');
+            setError('📄 Invalid File Type: Please upload a valid image (JPG, PNG) or PDF file only.');
             return;
         }
 
         // Validate file size (max 10MB)
         const maxSize = 10 * 1024 * 1024; // 10MB
         if (file.size > maxSize) {
-            setError('File size must be less than 10MB.');
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            setError(`📁 File Too Large: "${file.name}" is ${fileSizeMB}MB. Please use files smaller than 10MB for better OCR processing. Consider compressing the file or using a lower resolution image.`);
             return;
         }
+
+        // Additional file size warning for large files
+        const warningSizeMB = 5; // 5MB warning threshold
+        if (file.size > warningSizeMB * 1024 * 1024) {
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            console.warn(`⚠️ Large file detected: ${file.name} (${fileSizeMB}MB). Processing may take longer.`);
+        }
+
+        // Set selected file for preview
+        setSelectedFile(file);
+        setError(null); // Clear any previous errors
+    };
+
+    // Handle file processing (actual OCR processing)
+    const handleFileChange = async (file: File) => {
+        if (!file) return;
 
         try {
             setIsProcessing(true);
             setError(null);
             setExtractedQuestions([]);
+            setLastProcessedFile(file);
+            setSelectedFile(null); // Clear preview when processing starts
 
             console.log('Processing file:', file.name);
             const questions = await processImageToQuestions(file);
@@ -293,9 +314,31 @@ export default function OCRFeature({ onQuestionsExtracted }: OCRFeatureProps) {
             console.log('✅ Questions extracted successfully:', questions.length, 'questions');
         } catch (err) {
             console.error('❌ Error processing file:', err);
-            setError(err instanceof Error ? err.message : 'Failed to process file');
+            let errorMessage = err instanceof Error ? err.message : 'Failed to process file';
+            
+            // Enhanced error messages for common issues
+            if (errorMessage.includes('504') || errorMessage.includes('timeout')) {
+                errorMessage = `⏱️ Processing Timeout: The file "${file.name}" is taking too long to process. This usually happens with complex PDFs or large files. Try with a simpler/smaller file or wait a few minutes before retrying.`;
+            } else if (errorMessage.includes('500') || errorMessage.includes('Server error')) {
+                errorMessage = `🔧 Server Error: The OCR service is experiencing issues processing "${file.name}". This may be due to file complexity or temporary server overload. Please try again in a few moments.`;
+            } else if (errorMessage.includes('too large')) {
+                errorMessage = `📁 File Too Large: "${file.name}" exceeds the 10MB limit. Please compress the file or use a smaller image/PDF.`;
+            } else if (errorMessage.includes('file type')) {
+                errorMessage = `📄 Invalid File Type: Please use PDF, JPEG, JPG, or PNG files only.`;
+            } else if (errorMessage.includes('No questions')) {
+                errorMessage = `❓ No Questions Found: The file "${file.name}" doesn't contain recognizable questions. Please ensure the file has clear, readable text with multiple-choice questions.`;
+            }
+            
+            setError(errorMessage);
         } finally {
             setIsProcessing(false);
+        }
+    };
+
+    // Retry function for failed processing
+    const retryProcessing = () => {
+        if (lastProcessedFile) {
+            handleFileChange(lastProcessedFile);
         }
     };
 
@@ -316,14 +359,31 @@ export default function OCRFeature({ onQuestionsExtracted }: OCRFeatureProps) {
         setDragActive(false);
 
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFileChange(e.dataTransfer.files[0]);
+            handleFileSelection(e.dataTransfer.files[0]);
         }
     };
 
     // Handle file input click
     const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            handleFileChange(e.target.files[0]);
+            handleFileSelection(e.target.files[0]);
+        }
+    };
+
+    // Get file type icon and color
+    const getFileIcon = (type: string) => {
+        if (type.includes('pdf')) {
+            return { icon: '📄', color: 'text-red-600' };
+        } else if (type.includes('image')) {
+            return { icon: '🖼️', color: 'text-blue-600' };
+        }
+        return { icon: '📁', color: 'text-gray-600' };
+    };
+
+    // Process the selected file
+    const processSelectedFile = () => {
+        if (selectedFile) {
+            handleFileChange(selectedFile);
         }
     };
 
@@ -376,8 +436,10 @@ export default function OCRFeature({ onQuestionsExtracted }: OCRFeatureProps) {
                     {isProcessing ? (
                         <div className="flex flex-col items-center">
                             <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mb-4"></div>
-                            <p className="text-purple-600 font-medium">Processing file...</p>
-                            <p className="text-sm text-gray-500 mt-1">This may take a few moments</p>
+                            <p className="text-purple-600 font-medium">Processing "{lastProcessedFile?.name}"...</p>
+                            <p className="text-sm text-gray-500 mt-1">OCR analysis in progress - this may take 30 seconds to 2 minutes</p>
+                            <p className="text-xs text-gray-400 mt-1">⏳ Large or complex files take longer to process</p>
+                            <p className="text-xs text-gray-400">🔒 Please keep this tab open while processing</p>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center">
@@ -387,9 +449,14 @@ export default function OCRFeature({ onQuestionsExtracted }: OCRFeatureProps) {
                             <p className="text-lg font-medium text-gray-700 mb-2">
                                 Drop your file here or click to browse
                             </p>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 mb-3">
                                 Supports: JPG, PNG, PDF (max 10MB)
                             </p>
+                            <div className="text-xs text-gray-400 space-y-1">
+                                <p>📝 <strong>Best Results:</strong> Clear text, printed content, good contrast</p>
+                                <p>⚡ <strong>Faster Processing:</strong> Images &lt; 2MB, simple layouts</p>
+                                <p>🎯 <strong>Tip:</strong> Multiple choice questions work best</p>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -417,14 +484,113 @@ export default function OCRFeature({ onQuestionsExtracted }: OCRFeatureProps) {
                 </div>
             </div>
 
+            {/* File Preview */}
+            {selectedFile && !isProcessing && extractedQuestions.length === 0 && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                            <span className={`text-2xl mr-3 ${getFileIcon(selectedFile.type).color}`}>
+                                {getFileIcon(selectedFile.type).icon}
+                            </span>
+                            <div>
+                                <p className="font-medium text-blue-900">{selectedFile.name}</p>
+                                <p className="text-sm text-blue-700">
+                                    {(selectedFile.size / (1024 * 1024)).toFixed(1)} MB • {selectedFile.type}
+                                </p>
+                                {selectedFile.size > 5 * 1024 * 1024 && (
+                                    <p className="text-xs text-orange-600 mt-1">
+                                        ⚠️ Large file - processing may take 2-3 minutes
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setSelectedFile(null)}
+                                className="px-3 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={processSelectedFile}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium flex items-center"
+                            >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                Start OCR Processing
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Error Display */}
             {error && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <div className="flex items-center">
-                        <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p className="text-red-700">{error}</p>
+                    <div className="flex items-start justify-between">
+                        <div className="flex items-start">
+                            <svg className="w-5 h-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div className="flex-1">
+                                <p className="text-red-700 font-medium">OCR Processing Failed</p>
+                                <p className="text-red-600 text-sm mt-1 whitespace-pre-line">{error}</p>
+                                
+                                {/* Helpful tips for common errors */}
+                                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                                    <p className="text-yellow-800 text-sm font-medium mb-2">💡 Troubleshooting Tips:</p>
+                                    <ul className="text-yellow-700 text-xs space-y-1 list-disc list-inside">
+                                        {(error.includes('timeout') || error.includes('504')) && (
+                                            <>
+                                                <li>Try splitting large PDFs into smaller sections</li>
+                                                <li>Use images instead of complex PDFs when possible</li>
+                                                <li>Ensure stable internet connection</li>
+                                            </>
+                                        )}
+                                        {(error.includes('Server error') || error.includes('500')) && (
+                                            <>
+                                                <li>Backend OCR service may be overloaded - try again in 2-3 minutes</li>
+                                                <li>Check if the file has clear, readable text</li>
+                                                <li>Try with a different file to test if the issue persists</li>
+                                            </>
+                                        )}
+                                        {error.includes('No questions') && (
+                                            <>
+                                                <li>Ensure the file contains multiple-choice questions with options A, B, C, D</li>
+                                                <li>Text should be clear and not handwritten</li>
+                                                <li>Try scanning at higher resolution if using images</li>
+                                            </>
+                                        )}
+                                        <li>File formats: PDF, JPEG, PNG only (max 10MB)</li>
+                                        <li>Best results with printed text and clear formatting</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {lastProcessedFile && (
+                            <div className="flex flex-col gap-2 ml-4">
+                                <button
+                                    onClick={retryProcessing}
+                                    disabled={isProcessing}
+                                    className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                                >
+                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    Retry
+                                </button>
+                                <button
+                                    onClick={() => setError(null)}
+                                    className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600 flex items-center"
+                                >
+                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Dismiss
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

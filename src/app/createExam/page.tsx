@@ -55,12 +55,12 @@ export default function CreateExamForm() {
             setGeneratingExam(true);
             setExamError(null);
             
-            console.log("Generating exam with:", { 
-                selectedChapter, 
-                selectedTopic, 
-                difficulty, 
-                numberOfQuestions 
-            });
+            // console.log("Generating exam with:", { 
+            //     selectedChapter, 
+            //     selectedTopic, 
+            //     difficulty, 
+            //     numberOfQuestions 
+            // });
             
             const examResult = await generateExam(
                 selectedChapter,
@@ -69,7 +69,7 @@ export default function CreateExamForm() {
                 numberOfQuestions
             );
             
-            console.log('✅ Exam generated from dropdown:', examResult);
+            // console.log('✅ Exam generated from dropdown:', examResult);
             alert('Exam generated successfully from dropdown selection!');
             
         } catch (err) {
@@ -91,11 +91,11 @@ export default function CreateExamForm() {
             setGeneratingExam(true);
             setExamError(null);
             
-            console.log("Generating exam from prompt:", prompt);
+            // console.log("Generating exam from prompt:", prompt);
             
             const examResult = await generateExamFromPrompt(prompt);
             
-            console.log('✅ Exam generated from prompt:', examResult);
+            // console.log('✅ Exam generated from prompt:', examResult);
             alert('Exam generated successfully from prompt!');
             
             // Clear the prompt after successful generation
@@ -117,7 +117,7 @@ export default function CreateExamForm() {
                 setChaptersError(null);
                 const chaptersData = await getAllChapters();
                 setChapters(chaptersData);
-                console.log('✅ Chapters loaded:', chaptersData);
+                // console.log('✅ Chapters loaded:', chaptersData);
             } catch (err) {
                 console.error('❌ Error loading chapters:', err);
                 setChaptersError(err instanceof Error ? err.message : 'Failed to load chapters');
@@ -144,7 +144,7 @@ export default function CreateExamForm() {
                 setSelectedTopic(null); // Reset topic selection
                 const topicsData = await getTopicsByChapter(selectedChapter, { pageNumber: 1 });
                 setTopics(topicsData);
-                console.log('✅ Topics loaded for chapter', selectedChapter, ':', topicsData);
+                // console.log('✅ Topics loaded for chapter', selectedChapter, ':', topicsData);
             } catch (err) {
                 console.error('❌ Error loading topics:', err);
                 setTopicsError(err instanceof Error ? err.message : 'Failed to load topics');

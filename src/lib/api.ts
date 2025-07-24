@@ -19,13 +19,24 @@ export const API_ENDPOINTS = {
         GET_BY_ID: `${API_BASE_URL}/Topics`,
     },
     EXAM: {
+        GET_ALL: `${API_BASE_URL}/ExamSets`,
         GENERATE_FROM_DROPDOWN: `${API_BASE_URL}/ExamSets/generate-exam-from-dropdown`,
         GENERATE_FROM_PROMPT: `${API_BASE_URL}/ExamSets/generate-exam-from-prompt`,
         GET_USER_EXAMS: `${API_BASE_URL}/ExamSets/get-exam-by-current-user`,
         GET_EXAM_QUESTIONS: `${API_BASE_URL}/ExamSets`,
         DOWNLOAD_WORD: `${API_BASE_URL}/ExamSets/download-file-word-exam`,
+        UPDATE: `${API_BASE_URL}/ExamSets`,
+        DELETE: `${API_BASE_URL}/ExamSets`,
+    },
+    USERS: {
+        GET_ALL: `${API_BASE_URL}/Users`,
+        GET_BY_ID: `${API_BASE_URL}/Users`,
+        GET_BY_ROLE: `${API_BASE_URL}/Users/by-role`,
+        UPDATE: `${API_BASE_URL}/Users`,
+        DEACTIVATE: `${API_BASE_URL}/Users`,
     },
     QUESTIONS: {
+        GET_ALL: `${API_BASE_URL}/Questions`,
         PROCESS_IMAGE: `${API_BASE_URL}/Questions/process-image`,
         SAVE_QUESTION: `${API_BASE_URL}/Questions`,
     },
@@ -190,6 +201,51 @@ export interface SaveQuestionRequest {
     };
 }
 
+// Admin-specific interfaces
+export interface AdminExamData {
+    id: string;
+    title: string;
+    subject: string;
+    difficulty: number;
+    questionCount: number;
+    createdBy: string;
+    createdAt: string;
+    status: string;
+    attempts?: number;
+    avgScore?: number;
+    class?: any;
+    creator?: any;
+}
+
+export interface AdminUserData {
+    id: string;
+    username: string;
+    email: string;
+    role: number;
+    status: number;
+    createdAt: string;
+    isProvider: boolean;
+    identityId: string;
+}
+
+export interface AdminDashboardStats {
+    totalExams: number;
+    activeExams: number;
+    totalAttempts: number;
+    totalQuestions: number;
+    avgScore: number;
+    totalUsers: number;
+    activeUsers: number;
+}
+
+export interface UsersQueryParams {
+    pageNumber?: number;
+    pageSize?: number;
+    roleFilter?: number;
+    statusFilter?: number;
+    searchTerm?: string;
+}
+
 // User roles
 export const USER_ROLES = {
     ADMIN: 1,
@@ -222,11 +278,11 @@ export async function authenticatedApiCall<T = unknown>(url: string, options: Re
                   localStorage.getItem('auth_token');
     
     if (!token) {
-        console.log('🔍 Available localStorage keys:', Object.keys(localStorage));
+        // console.log('🔍 Available localStorage keys:', Object.keys(localStorage));
         throw new Error('No access token found. Please login first.');
     }
 
-    console.log('🔑 Using token for API call:', token.substring(0, 20) + '...');
+    // console.log('🔑 Using token for API call:', token.substring(0, 20) + '...');
 
     const response = await fetch(url, {
         ...options,
@@ -368,10 +424,10 @@ export async function generateExam(
             classId
         };
 
-        console.log('🔄 Generating exam with:', {
-            ...requestData,
-            difficulty: `${difficulty} (${DIFFICULTY_MAPPING[difficulty]})`
-        });
+        // console.log('🔄 Generating exam with:', {
+        //     ...requestData,
+        //     difficulty: `${difficulty} (${DIFFICULTY_MAPPING[difficulty]})`
+        // });
 
         const response = await authenticatedApiCall(
             API_ENDPOINTS.EXAM.GENERATE_FROM_DROPDOWN,
@@ -381,7 +437,7 @@ export async function generateExam(
             }
         );
 
-        console.log('✅ Exam generated successfully:', response);
+        // console.log('✅ Exam generated successfully:', response);
         return response.data;
     } catch (error) {
         console.error('❌ Error generating exam:', error);
@@ -392,7 +448,7 @@ export async function generateExam(
 // Generate exam from prompt
 export async function generateExamFromPrompt(prompt: string): Promise<any> {
     try {
-        console.log('🔄 Generating exam from prompt:', prompt);
+        // console.log('🔄 Generating exam from prompt:', prompt);
 
         const response = await authenticatedApiCall(
             API_ENDPOINTS.EXAM.GENERATE_FROM_PROMPT,
@@ -402,7 +458,7 @@ export async function generateExamFromPrompt(prompt: string): Promise<any> {
             }
         );
 
-        console.log('✅ Exam generated from prompt successfully:', response);
+        // console.log('✅ Exam generated from prompt successfully:', response);
         return response.data;
     } catch (error) {
         console.error('❌ Error generating exam from prompt:', error);
@@ -413,7 +469,7 @@ export async function generateExamFromPrompt(prompt: string): Promise<any> {
 // Get user's exam history
 export async function getUserExams(): Promise<ExamSet[]> {
     try {
-        console.log('🔄 Fetching user exam history...');
+        // console.log('🔄 Fetching user exam history...');
 
         const response = await authenticatedApiCall(
             API_ENDPOINTS.EXAM.GET_USER_EXAMS,
@@ -422,7 +478,7 @@ export async function getUserExams(): Promise<ExamSet[]> {
             }
         ) as ApiResponse<ExamHistoryResponse>;
 
-        console.log('✅ User exams fetched successfully:', response.data);
+        // console.log('✅ User exams fetched successfully:', response.data);
         
         // Handle the paginated response structure
         const examSets = (response.data as any)?.$values || [];
@@ -436,7 +492,7 @@ export async function getUserExams(): Promise<ExamSet[]> {
 // Get exam questions by exam ID
 export async function getExamQuestions(examId: string): Promise<ExamQuestion[]> {
     try {
-        console.log('🔄 Fetching exam questions for exam:', examId);
+        // console.log('🔄 Fetching exam questions for exam:', examId);
 
         const response = await authenticatedApiCall(
             `${API_ENDPOINTS.EXAM.GET_EXAM_QUESTIONS}/${examId}`,
@@ -445,7 +501,7 @@ export async function getExamQuestions(examId: string): Promise<ExamQuestion[]> 
             }
         ) as ApiResponse<any>;
 
-        console.log('✅ Exam questions fetched successfully:', response.data);
+        // console.log('✅ Exam questions fetched successfully:', response.data);
         
         // Handle the new response structure
         const examSet = response.data;
@@ -495,7 +551,7 @@ export async function getExamQuestions(examId: string): Promise<ExamQuestion[]> 
             };
         }));
         
-        console.log('🔄 Transformed questions:', questions);
+        // console.log('🔄 Transformed questions:', questions);
         return questions;
     } catch (error) {
         console.error('❌ Error fetching exam questions:', error);
@@ -506,7 +562,7 @@ export async function getExamQuestions(examId: string): Promise<ExamQuestion[]> 
 // OCR - Process image/PDF to extract questions
 export async function processImageToQuestions(file: File): Promise<ExamQuestion[]> {
     try {
-        console.log('🔄 Processing image/PDF for question extraction:', file.name);
+        // console.log('🔄 Processing image/PDF for question extraction:', file.name);
 
         // Check if we're in browser environment
         if (typeof window === 'undefined') {
@@ -521,42 +577,132 @@ export async function processImageToQuestions(file: File): Promise<ExamQuestion[
             throw new Error('No authentication token found');
         }
 
+        // Validate file size (limit to 10MB for better processing)
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+            throw new Error('File too large. Please use files smaller than 10MB for better processing.');
+        }
+
+        // Validate file type
+        const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+        if (!validTypes.includes(file.type)) {
+            throw new Error('Invalid file type. Please use PDF, JPEG, JPG, or PNG files.');
+        }
+
         // Create FormData for file upload
         const formData = new FormData();
         formData.append('File', file);
 
-        const response = await fetch(API_ENDPOINTS.QUESTIONS.PROCESS_IMAGE, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': '*/*'
-            },
-            body: formData
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ OCR processing failed:', response.status, errorText);
-            throw new Error(`OCR processing failed: ${response.status} ${response.statusText}`);
+        // Create AbortController for timeout handling
+        const controller = new AbortController();
+        // Increase timeout based on file size
+        const fileSize = file.size / (1024 * 1024); // Size in MB
+        let timeoutDuration = 60000; // Base timeout: 1 minute
+        
+        if (fileSize > 5) {
+            timeoutDuration = 180000; // 3 minutes for large files (>5MB)
+        } else if (fileSize > 2) {
+            timeoutDuration = 120000; // 2 minutes for medium files (>2MB)
         }
+        
+        const timeoutId = setTimeout(() => {
+            controller.abort();
+        }, timeoutDuration);
 
-        const result = await response.json() as ApiResponse<{ $values: ExamQuestion[] }>;
-        
-        console.log('✅ OCR processing successful:', result.data);
-        
-        // Extract questions from the response
-        const questions = result.data?.$values || [];
-        return questions;
+        try {
+            const response = await fetch(API_ENDPOINTS.QUESTIONS.PROCESS_IMAGE, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': '*/*'
+                },
+                body: formData,
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                let errorMessage = '';
+                
+                switch (response.status) {
+                    case 500:
+                        errorMessage = 'Server error occurred while processing the file. The OCR service may be temporarily unavailable. Please try again later.';
+                        break;
+                    case 504:
+                        errorMessage = 'Processing timeout. The file may be too complex or the server is overloaded. Please try with a smaller file or try again later.';
+                        break;
+                    case 413:
+                        errorMessage = 'File too large. Please use a smaller file.';
+                        break;
+                    case 415:
+                        errorMessage = 'Unsupported file type. Please use PDF, JPEG, JPG, or PNG files.';
+                        break;
+                    case 401:
+                        errorMessage = 'Authentication failed. Please log in again.';
+                        break;
+                    case 403:
+                        errorMessage = 'You do not have permission to use the OCR service.';
+                        break;
+                    default:
+                        const errorText = await response.text().catch(() => 'Unknown error');
+                        errorMessage = `OCR processing failed (${response.status}): ${errorText}`;
+                }
+                
+                console.error('❌ OCR processing failed:', response.status, errorMessage);
+                throw new Error(errorMessage);
+            }
+
+            const result = await response.json() as ApiResponse<{ $values: ExamQuestion[] }>;
+            
+            // console.log('✅ OCR processing successful:', result.data);
+            
+            // Extract questions from the response
+            const questions = result.data?.$values || [];
+            
+            if (questions.length === 0) {
+                throw new Error('No questions were extracted from the file. Please ensure the file contains readable text and question content.');
+            }
+            
+            return questions;
+        } catch (fetchError) {
+            clearTimeout(timeoutId);
+            
+            if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+                const timeoutMinutes = Math.ceil(timeoutDuration / 60000);
+                throw new Error(`Processing timeout after ${timeoutMinutes} minute(s). The file "${file.name}" (${fileSize.toFixed(1)}MB) may be too complex or contain dense content. Try using a smaller file, splitting the document into sections, or converting to a simpler image format.`);
+            }
+            
+            throw fetchError;
+        }
     } catch (error) {
         console.error('❌ Error processing image/PDF:', error);
-        throw error;
+        
+        // Provide user-friendly error messages
+        if (error instanceof Error) {
+            // Re-throw with the original message if it's already user-friendly
+            if (error.message.includes('timeout') || 
+                error.message.includes('Server error') || 
+                error.message.includes('too large') ||
+                error.message.includes('Authentication') ||
+                error.message.includes('permission') ||
+                error.message.includes('file type') ||
+                error.message.includes('No questions')) {
+                throw error;
+            }
+            
+            // Provide generic user-friendly message for other errors
+            throw new Error('Failed to process the file. Please check your internet connection and try again.');
+        }
+        
+        throw new Error('An unexpected error occurred while processing the file.');
     }
 }
 
 // Save question to database
 export async function saveQuestion(questionData: SaveQuestionRequest): Promise<any> {
     try {
-        console.log('🔄 Saving question to database:', questionData);
+        // console.log('🔄 Saving question to database:', questionData);
 
         const response = await authenticatedApiCall(
             API_ENDPOINTS.QUESTIONS.SAVE_QUESTION,
@@ -566,7 +712,7 @@ export async function saveQuestion(questionData: SaveQuestionRequest): Promise<a
             }
         );
 
-        console.log('✅ Question saved successfully:', response);
+        // console.log('✅ Question saved successfully:', response);
         return response.data;
     } catch (error) {
         console.error('❌ Error saving question:', error);
@@ -577,7 +723,7 @@ export async function saveQuestion(questionData: SaveQuestionRequest): Promise<a
 // Download exam as Word document
 export async function downloadExamWord(examSetId: string): Promise<void> {
     try {
-        console.log('🔄 Downloading exam Word document for exam:', examSetId);
+        // console.log('🔄 Downloading exam Word document for exam:', examSetId);
 
         // Check if we're in browser environment
         if (typeof window === 'undefined') {
@@ -623,9 +769,123 @@ export async function downloadExamWord(examSetId: string): Promise<void> {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
 
-        console.log('✅ Exam downloaded successfully');
+        // console.log('✅ Exam downloaded successfully');
     } catch (error) {
         console.error('❌ Error downloading exam:', error);
+        throw error;
+    }
+}
+
+// Admin API Functions
+
+// Get all exams for admin dashboard
+export async function getAllExams(params?: { pageNumber?: number; pageSize?: number }): Promise<PaginatedResponse<AdminExamData>> {
+    try {
+        const queryParams = new URLSearchParams();
+        if (params?.pageNumber) queryParams.append('pageNumber', params.pageNumber.toString());
+        if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
+        
+        const url = params ? `${API_ENDPOINTS.EXAM.GET_ALL}?${queryParams.toString()}` : API_ENDPOINTS.EXAM.GET_ALL;
+        const response = await authenticatedApiCall(url, { method: 'GET' }) as ApiResponse<PaginatedResponse<AdminExamData>>;
+        return response.data;
+    } catch (error) {
+        console.error('❌ Error fetching all exams:', error);
+        throw error;
+    }
+}
+
+// Get all users for admin dashboard
+export async function getAllUsers(params?: UsersQueryParams): Promise<PaginatedResponse<AdminUserData>> {
+    try {
+        const queryParams = new URLSearchParams();
+        if (params?.pageNumber) queryParams.append('pageNumber', params.pageNumber.toString());
+        if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
+        if (params?.roleFilter !== undefined) queryParams.append('roleFilter', params.roleFilter.toString());
+        if (params?.statusFilter !== undefined) queryParams.append('statusFilter', params.statusFilter.toString());
+        if (params?.searchTerm) queryParams.append('searchTerm', params.searchTerm);
+        
+        const url = params ? `${API_ENDPOINTS.USERS.GET_ALL}?${queryParams.toString()}` : API_ENDPOINTS.USERS.GET_ALL;
+        const response = await authenticatedApiCall(url, { method: 'GET' }) as ApiResponse<PaginatedResponse<AdminUserData>>;
+        return response.data;
+    } catch (error) {
+        console.error('❌ Error fetching all users:', error);
+        throw error;
+    }
+}
+
+// Get all questions for admin dashboard
+export async function getAllQuestions(params?: { pageNumber?: number; pageSize?: number }): Promise<PaginatedResponse<ExamQuestion>> {
+    try {
+        const queryParams = new URLSearchParams();
+        if (params?.pageNumber) queryParams.append('pageNumber', params.pageNumber.toString());
+        if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
+        
+        const url = params ? `${API_ENDPOINTS.QUESTIONS.GET_ALL}?${queryParams.toString()}` : API_ENDPOINTS.QUESTIONS.GET_ALL;
+        const response = await authenticatedApiCall(url, { method: 'GET' }) as ApiResponse<PaginatedResponse<ExamQuestion>>;
+        return response.data;
+    } catch (error) {
+        console.error('❌ Error fetching all questions:', error);
+        throw error;
+    }
+}
+
+// Delete exam (admin only)
+export async function deleteExam(examId: string): Promise<void> {
+    try {
+        await authenticatedApiCall(`${API_ENDPOINTS.EXAM.DELETE}/${examId}`, { method: 'DELETE' });
+    } catch (error) {
+        console.error('❌ Error deleting exam:', error);
+        throw error;
+    }
+}
+
+// Deactivate user (admin only)
+export async function deactivateUser(userId: string): Promise<void> {
+    try {
+        await authenticatedApiCall(`${API_ENDPOINTS.USERS.DEACTIVATE}/${userId}/deactivate`, { method: 'PATCH' });
+    } catch (error) {
+        console.error('❌ Error deactivating user:', error);
+        throw error;
+    }
+}
+
+// Get dashboard statistics
+export async function getDashboardStats(): Promise<AdminDashboardStats> {
+    try {
+        // Fetch data from multiple endpoints
+        const [examsResponse, usersResponse, questionsResponse] = await Promise.all([
+            getAllExams({ pageSize: 1000 }), // Get all exams for stats
+            getAllUsers({ pageSize: 1000 }),  // Get all users for stats
+            getAllQuestions({ pageSize: 1000 }) // Get all questions for stats
+        ]);
+
+        const allExams = examsResponse.items.$values || [];
+        const allUsers = usersResponse.items.$values || [];
+        const allQuestions = questionsResponse.items.$values || [];
+
+        // Calculate statistics
+        const totalExams = allExams.length;
+        const activeExams = allExams.filter(exam => exam.status === 'Active' || exam.status === 'Published').length;
+        const totalUsers = allUsers.length;
+        const activeUsers = allUsers.filter(user => user.status === 1).length; // Assuming 1 is active status
+        const totalQuestions = allQuestions.length;
+
+        // Calculate total attempts and average score (mock data for now since API doesn't provide this)
+        const totalAttempts = allExams.reduce((sum, exam) => sum + (exam.attempts || 0), 0);
+        const avgScore = allExams.filter(exam => (exam.avgScore || 0) > 0)
+            .reduce((sum, exam, _, arr) => sum + (exam.avgScore || 0) / arr.length, 0);
+
+        return {
+            totalExams,
+            activeExams,
+            totalAttempts: totalAttempts || 0,
+            totalQuestions,
+            avgScore: Math.round(avgScore) || 0,
+            totalUsers,
+            activeUsers
+        };
+    } catch (error) {
+        console.error('❌ Error fetching dashboard stats:', error);
         throw error;
     }
 }

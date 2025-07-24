@@ -27,10 +27,10 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
     const isFirebaseConfigured = !!(auth && googleProvider);
 
     const handleGoogleLogin = async () => {
-        console.log('🔘 Google login button clicked');
+        // console.log('🔘 Google login button clicked');
         
         if (disabled || isLoading || isGoogleLoading) {
-            console.log('🔘 Button disabled, skipping:', { disabled, isLoading, isGoogleLoading });
+            // console.log('🔘 Button disabled, skipping:', { disabled, isLoading, isGoogleLoading });
             return;
         }
 
@@ -45,10 +45,10 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
 
         try {
             setIsGoogleLoading(true);
-            console.log('🔄 Initiating Google popup login...');
+            // console.log('🔄 Initiating Google popup login...');
             await loginWithGoogle();
             
-            console.log('✅ Google login completed successfully');
+            // console.log('✅ Google login completed successfully');
             
             // If success callback is provided, call it
             if (onSuccess) {
@@ -93,7 +93,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
         <button
             type="button"
             onClick={() => {
-                console.log('🔘 Google button clicked!');
+                // console.log('🔘 Google button clicked!');
                 handleGoogleLogin();
             }}
             disabled={disabled || isLoading || isGoogleLoading}

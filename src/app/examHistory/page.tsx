@@ -26,7 +26,7 @@ export default function ExamHistoryPage() {
                 setExamsError(null);
                 const exams = await getUserExams();
                 setExamSets(exams);
-                console.log('✅ Exam history loaded:', exams);
+                // console.log('✅ Exam history loaded:', exams);
             } catch (err) {
                 console.error('❌ Error loading exam history:', err);
                 setExamsError(err instanceof Error ? err.message : 'Failed to load exam history');

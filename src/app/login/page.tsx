@@ -28,15 +28,15 @@ export default function TokenLoginForm() {
 
         // Redirect if already authenticated
     useEffect(() => {
-        console.log('🔍 Login redirect check:', {
-            isAuthenticated,
-            user,
-            isMounted,
-            userRole: user?.role
-        });
+        // console.log('🔍 Login redirect check:', {
+        //     isAuthenticated,
+        //     user,
+        //     isMounted,
+        //     userRole: user?.role
+        // });
         
         if (isAuthenticated && user && isMounted) {
-            console.log('🚀 Redirecting to home page');
+            // console.log('🚀 Redirecting to home page');
             // Use replace instead of push to prevent back navigation to login
             router.replace('/');
         }
@@ -65,11 +65,11 @@ export default function TokenLoginForm() {
                 return;
             }
 
-            console.log('🔐 Starting login process...');
+            // console.log('🔐 Starting login process...');
             await login(email, password);
             
             // Login successful - wait a bit for state to update, then check for redirect
-            console.log('✅ Login function completed, waiting for state update...');
+            // console.log('✅ Login function completed, waiting for state update...');
             
         } catch (error: any) {
             console.error('Login error:', error);

@@ -16,11 +16,11 @@ export default function TestChaptersPage() {
         try {
             setLoadingChapters(true);
             setChaptersError(null);
-            console.log('🔄 Fetching chapters...');
+            // console.log('🔄 Fetching chapters...');
             
             const chaptersData = await getAllChapters();
             setChapters(chaptersData);
-            console.log('✅ Chapters fetched successfully:', chaptersData);
+            // console.log('✅ Chapters fetched successfully:', chaptersData);
         } catch (err) {
             console.error('❌ Error fetching chapters:', err);
             setChaptersError(err instanceof Error ? err.message : 'Failed to fetch chapters');
@@ -33,11 +33,11 @@ export default function TestChaptersPage() {
         try {
             setLoadingTopics(true);
             setTopicsError(null);
-            console.log('🔄 Fetching topics for chapter:', chapterId);
+            // console.log('🔄 Fetching topics for chapter:', chapterId);
             
             const topicsData = await getTopicsByChapter(chapterId, { pageNumber: 1, pageSize: 50 });
             setTopics(topicsData);
-            console.log('✅ Topics fetched successfully:', topicsData);
+            // console.log('✅ Topics fetched successfully:', topicsData);
         } catch (err) {
             console.error('❌ Error fetching topics:', err);
             setTopicsError(err instanceof Error ? err.message : 'Failed to fetch topics');
